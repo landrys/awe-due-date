@@ -39,14 +39,14 @@
 </dependency> 
     <dependency>
       <groupId>com.landry.aws.lambda</groupId>
-      <artifactId>dynamo</artifactId>
+      <artifactId>aws-dynamo</artifactId>
       <version>4.0.0</version>
       <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>com.landry.aws.lambda</groupId>
-      <artifactId>awscommon</artifactId>
+      <artifactId>aws-common</artifactId>
       <version>4.0.0</version>
       <scope>compile</scope>
     </dependency>

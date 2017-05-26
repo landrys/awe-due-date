@@ -3,7 +3,7 @@ package com.landry.aws.lambda.duedate;
 import java.util.Iterator;
 import org.joda.time.DateTime;
 
-import com.amazonaws.lambda.lcadapter.invoker.CheckForLCVendorUpdatesInvoker;
+import com.amazonaws.lambda.lcadapter.invoker.LCVendorAdapterInvoker;
 import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
 import com.landry.aws.lambda.common.model.DueDateInput;
@@ -14,7 +14,6 @@ import com.landry.aws.lambda.duedate.model.VendorShipTimeDataBeans;
 public class DueDateService
 {
 
-	private static boolean alreadyCreated = false;
 	private static DueDateService instance;
 
 	private DueDateService()
@@ -44,15 +43,9 @@ public class DueDateService
 		Integer usedShipTimeId = null;
 
 		VendorShipTimeDataBeans vsdbs = VendorShipTimeDataBeans.instance();
+
 		if (dueDateInput.getReload() != null && dueDateInput.getReload())
-			 return reload(vsdbs);
-        // Just doing this so that it will not  call DB twice on first creation
-		// while I am testing not caching.
-		// I will remove this and just have the instance no be a singleton
-		// if we decide not to cache.
-		//if (alreadyCreated)
-		//	vsdbs.reload();
-		//alreadyCreated = true;
+			return reload(vsdbs);
 
 		while (it.hasNext())
 		{
@@ -71,23 +64,21 @@ public class DueDateService
 
 		DueDateOutput calculatedArrivalDate = new DueDateOutput.Builder()
 				.arrivalDate(MyDateUtil.toStringDate(arrivalDate, "MM-dd-yyyy"))
-				.nextOrderDate(MyDateUtil.toStringDate(startDate, "MM-dd-yyyy"))
-				.dueDateInput(dueDateInput)
-				.vendorShipTimeId(usedShipTimeId)
-				.info("Success")
-				.build();
+				.nextOrderDate(MyDateUtil.toStringDate(startDate, "MM-dd-yyyy")).dueDateInput(dueDateInput)
+				.vendorShipTimeId(usedShipTimeId).info("Success").build();
 
 		return calculatedArrivalDate;
 	}
 
 	private DueDateOutput reload(VendorShipTimeDataBeans vsdbs) throws Exception
 	{
-		vsdbs.reload();
 
-	    CheckForLCVendorUpdatesInvoker checkForLCUpdatesService = LambdaInvokerFactory.builder()
-			.lambdaClient(AWSLambdaClientBuilder.defaultClient()).build(CheckForLCVendorUpdatesInvoker.class);
-	    checkForLCUpdatesService.checkForLCVendorUpdates("");
-		
+	    LCVendorAdapterInvoker checkForLCUpdatesService = LambdaInvokerFactory.builder()
+			.lambdaClient(AWSLambdaClientBuilder.defaultClient()).build(LCVendorAdapterInvoker.class);
+	    checkForLCUpdatesService.lcVendorAdapter("");
+
+	    vsdbs.reload();
+
 		return new DueDateOutput.Builder().info("Synced and Reloaded.").build();
 	}
 

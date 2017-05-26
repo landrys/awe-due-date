@@ -9,19 +9,17 @@ import java.util.Set;
 
 import org.joda.time.LocalTime;
 
-import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
-import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
+import com.landry.aws.lambda.dynamo.dao.DynamoVendorShipTimeDAO;
 import com.landry.aws.lambda.dynamo.dao.DynamoVendorShipTimeSupportDAO;
 import com.landry.aws.lambda.dynamo.domain.VendorShipTime;
 import com.landry.aws.lambda.dynamo.domain.VendorShipTimeSupport;
-import com.landry.aws.lambda.dynamo.invoker.GentVendorShipTimeSupportsInvoker;
-import com.landry.aws.lambda.dynamo.invoker.GentVendorShipTimesInvoker;
 
 
 public class VendorShipTimeDataBeanBuilder
 {
 
 	private static final DynamoVendorShipTimeSupportDAO vstsDao = DynamoVendorShipTimeSupportDAO.instance();
+	private static final DynamoVendorShipTimeDAO vstDao = DynamoVendorShipTimeDAO.instance();
 	//@Autowired
 	//VendorRepository vendorRepository;
     //private List<Vendor> archivedVendors;
@@ -31,7 +29,7 @@ public class VendorShipTimeDataBeanBuilder
 		super();
 	}
 
-	private Set<VendorShipTime> vendorShipTimes;
+	private List<VendorShipTime> vendorShipTimes;
 	private Integer defaultBusinessDays = 5; 
 	private Integer defaultShippingDays = 5;
 	private String defaultCutOffTime = "12:00";
@@ -101,9 +99,12 @@ public class VendorShipTimeDataBeanBuilder
 	private void loadVendorShipTimes() throws Exception
 	{
 
+		/*
 		GentVendorShipTimesInvoker service = LambdaInvokerFactory.builder()
 				.lambdaClient(AWSLambdaClientBuilder.defaultClient()).build(GentVendorShipTimesInvoker.class);
 		vendorShipTimes = service.getVendorShipTimes("");
+		*/
+		vendorShipTimes = vstDao.findAll();
 	}
 
 	private void loadConfigData()

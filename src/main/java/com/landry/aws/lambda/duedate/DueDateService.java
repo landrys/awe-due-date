@@ -3,6 +3,9 @@ package com.landry.aws.lambda.duedate;
 import java.util.Iterator;
 import org.joda.time.DateTime;
 
+import com.amazonaws.lambda.lcadapter.invoker.CheckForLCVendorUpdatesInvoker;
+import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
+import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
 import com.landry.aws.lambda.common.model.DueDateInput;
 import com.landry.aws.lambda.common.model.DueDateOutput;
 import com.landry.aws.lambda.common.util.MyDateUtil;
@@ -12,21 +15,25 @@ public class DueDateService
 {
 
 	private static boolean alreadyCreated = false;
-	private  static DueDateService instance;
+	private static DueDateService instance;
 
-	private DueDateService() {
-    }
+	private DueDateService()
+	{
+	}
 
-	public static DueDateService instance() {
+	public static DueDateService instance()
+	{
 
-        if (instance == null) {
-            synchronized(DueDateService.class) {
-                if (instance == null)
-                    instance = new DueDateService();
-            }
-        }
-        return instance;
-    }
+		if (instance == null)
+		{
+			synchronized (DueDateService.class)
+			{
+				if (instance == null)
+					instance = new DueDateService();
+			}
+		}
+		return instance;
+	}
 
 	public DueDateOutput getMeTheBestArrivalDate(DueDateInput dueDateInput) throws Exception
 	{
@@ -37,13 +44,15 @@ public class DueDateService
 		Integer usedShipTimeId = null;
 
 		VendorShipTimeDataBeans vsdbs = VendorShipTimeDataBeans.instance();
+		if (dueDateInput.getReload() != null && dueDateInput.getReload())
+			 return reload(vsdbs);
         // Just doing this so that it will not  call DB twice on first creation
 		// while I am testing not caching.
 		// I will remove this and just have the instance no be a singleton
 		// if we decide not to cache.
-		if (alreadyCreated)
-			vsdbs.reload();
-		alreadyCreated = true;
+		//if (alreadyCreated)
+		//	vsdbs.reload();
+		//alreadyCreated = true;
 
 		while (it.hasNext())
 		{
@@ -69,6 +78,17 @@ public class DueDateService
 				.build();
 
 		return calculatedArrivalDate;
+	}
+
+	private DueDateOutput reload(VendorShipTimeDataBeans vsdbs) throws Exception
+	{
+		vsdbs.reload();
+
+	    CheckForLCVendorUpdatesInvoker checkForLCUpdatesService = LambdaInvokerFactory.builder()
+			.lambdaClient(AWSLambdaClientBuilder.defaultClient()).build(CheckForLCVendorUpdatesInvoker.class);
+	    checkForLCUpdatesService.checkForLCVendorUpdates("");
+		
+		return new DueDateOutput.Builder().info("Synced and Reloaded.").build();
 	}
 
 }

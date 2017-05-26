@@ -11,6 +11,7 @@ import org.joda.time.LocalTime;
 
 import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
+import com.landry.aws.lambda.dynamo.dao.DynamoVendorShipTimeSupportDAO;
 import com.landry.aws.lambda.dynamo.domain.VendorShipTime;
 import com.landry.aws.lambda.dynamo.domain.VendorShipTimeSupport;
 import com.landry.aws.lambda.dynamo.invoker.GentVendorShipTimeSupportsInvoker;
@@ -19,6 +20,8 @@ import com.landry.aws.lambda.dynamo.invoker.GentVendorShipTimesInvoker;
 
 public class VendorShipTimeDataBeanBuilder
 {
+
+	private static final DynamoVendorShipTimeSupportDAO vstsDao = DynamoVendorShipTimeSupportDAO.instance();
 	//@Autowired
 	//VendorRepository vendorRepository;
     //private List<Vendor> archivedVendors;
@@ -38,37 +41,7 @@ public class VendorShipTimeDataBeanBuilder
 	{
 		loadConfigData();
 		loadVendorShipTimes();
-		//getArchivedVendors();
-		return removeArchived(buildDueDatesFromVendorShipTimes());
-	}
-
-	/*
-	private void getArchivedVendors()
-	{
-	    archivedVendors = vendorRepository.findByArchived(true);
-	}
-	*/
-
-	private List<VendorShipTimeDataBean> removeArchived( List<VendorShipTimeDataBean> mappedObjects )
-	{
-		Iterator<VendorShipTimeDataBean> it = mappedObjects.iterator();
-		while ( it.hasNext() )
-			if (isArchived(it.next().getVendorId()))
-				it.remove();
-
-		return mappedObjects;
-	}
-
-	private boolean isArchived( BigInteger vendorId )
-	{
-		/*
-		Iterator<Vendor> it = archivedVendors.iterator();
-		while ( it.hasNext() )
-			if (it.next().getId().compareTo(vendorId) == 0)
-				return true;
-		
-		*/
-		return false;
+		return buildDueDatesFromVendorShipTimes();
 	}
 
 	private List<VendorShipTimeDataBean> buildDueDatesFromVendorShipTimes()
@@ -135,9 +108,10 @@ public class VendorShipTimeDataBeanBuilder
 
 	private void loadConfigData()
 	{
-		GentVendorShipTimeSupportsInvoker service = LambdaInvokerFactory.builder()
-				.lambdaClient(AWSLambdaClientBuilder.defaultClient()).build(GentVendorShipTimeSupportsInvoker.class);
-		Set<VendorShipTimeSupport> vendorShipTimeSupports = service.getVendorShipTimeSupports("");
+		//GentVendorShipTimeSupportsInvoker service = LambdaInvokerFactory.builder()
+		//		.lambdaClient(AWSLambdaClientBuilder.defaultClient()).build(GentVendorShipTimeSupportsInvoker.class);
+		//Set<VendorShipTimeSupport> vendorShipTimeSupports = service.getVendorShipTimeSupports("");
+		List<VendorShipTimeSupport> vendorShipTimeSupports = vstsDao.findAll();
 		VendorShipTimeSupport defaultSupport = null;
 		Iterator<VendorShipTimeSupport> it = vendorShipTimeSupports.iterator();
 		while (it.hasNext())

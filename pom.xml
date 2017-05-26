@@ -43,7 +43,12 @@
       <version>4.0.0</version>
       <scope>compile</scope>
     </dependency>
-
+    <dependency>
+      <groupId>com.landry.aws.lambda</groupId>
+      <artifactId>aws-lc-adapter</artifactId>
+      <version>4.0.0</version>
+      <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>com.landry.aws.lambda</groupId>
       <artifactId>aws-common</artifactId>

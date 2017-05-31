@@ -8,6 +8,7 @@ import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
 import com.landry.aws.lambda.common.model.DueDateInput;
 import com.landry.aws.lambda.common.model.DueDateOutput;
+import com.landry.aws.lambda.common.model.LCVendorAdapterInput;
 import com.landry.aws.lambda.common.util.MyDateUtil;
 import com.landry.aws.lambda.duedate.model.VendorShipTimeDataBeans;
 
@@ -75,7 +76,7 @@ public class DueDateService
 
 	    LCVendorAdapterInvoker checkForLCUpdatesService = LambdaInvokerFactory.builder()
 			.lambdaClient(AWSLambdaClientBuilder.defaultClient()).build(LCVendorAdapterInvoker.class);
-	    checkForLCUpdatesService.lcVendorAdapter("");
+	    checkForLCUpdatesService.lcVendorAdapter(new LCVendorAdapterInput());
 
 	    vsdbs.reload();
 

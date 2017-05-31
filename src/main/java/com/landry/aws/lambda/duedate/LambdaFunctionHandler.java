@@ -7,9 +7,17 @@ import com.landry.aws.lambda.common.model.DueDateOutput;
 
 public class LambdaFunctionHandler implements RequestHandler<DueDateInput, DueDateOutput> {
 
+	private static String containerId;
     @Override
     public DueDateOutput handleRequest(DueDateInput input, Context lambdaContext) {
 
+		if ( input != null && input.getPing() != null && containerId!=null )
+			return null;
+
+    	if (containerId == null )
+    		containerId = lambdaContext.getAwsRequestId();
+
+		lambdaContext.getLogger().log("ContainerId: " + containerId);
 		lambdaContext.getLogger().log("Input: " + input.toString());
 
 	    DueDateService dds =  DueDateService.instance();

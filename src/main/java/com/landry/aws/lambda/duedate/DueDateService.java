@@ -3,7 +3,7 @@ package com.landry.aws.lambda.duedate;
 import java.util.Iterator;
 import org.joda.time.DateTime;
 
-import com.amazonaws.lambda.lcadapter.invoker.LCVendorAdapterInvoker;
+import com.landry.aws.lambda.common.invoker.LCVendorAdapterInvoker;
 import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.invoke.LambdaInvokerFactory;
 import com.landry.aws.lambda.common.model.DueDateInput;

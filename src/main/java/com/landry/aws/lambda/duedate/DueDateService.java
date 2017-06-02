@@ -38,15 +38,19 @@ public class DueDateService
 	public DueDateOutput getMeTheBestArrivalDate(DueDateInput dueDateInput) throws Exception
 	{
 
+		
+		VendorShipTimeDataBeans vsdbs = VendorShipTimeDataBeans.instance();
+		if (dueDateInput.getReload() != null && dueDateInput.getReload())
+			return reload(vsdbs);
+		
 		DateTime startDate = null;
 		DateTime arrivalDate = null;
 		Iterator<Integer> it = dueDateInput.getVendorShipTimeIds().iterator();
 		Integer usedShipTimeId = null;
 
-		VendorShipTimeDataBeans vsdbs = VendorShipTimeDataBeans.instance();
+		
 
-		if (dueDateInput.getReload() != null && dueDateInput.getReload())
-			return reload(vsdbs);
+		
 
 		while (it.hasNext())
 		{
@@ -73,14 +77,13 @@ public class DueDateService
 
 	private DueDateOutput reload(VendorShipTimeDataBeans vsdbs) throws Exception
 	{
-
-	    LCVendorAdapterInvoker checkForLCUpdatesService = LambdaInvokerFactory.builder()
-			.lambdaClient(AWSLambdaClientBuilder.defaultClient()).build(LCVendorAdapterInvoker.class);
-	    checkForLCUpdatesService.lcVendorAdapter(new LCVendorAdapterInput());
-
 	    vsdbs.reload();
-
-		return new DueDateOutput.Builder().info("Synced and Reloaded.").build();
+		return new DueDateOutput.Builder().info("Reloaded and built vendor ship time data beans.").build();
 	}
 
 }
+
+		// call lcVendorAdapter from its own service from client. then call reload here.
+	    //LCVendorAdapterInvoker checkForLCUpdatesService = LambdaInvokerFactory.builder()
+	//		.lambdaClient(AWSLambdaClientBuilder.defaultClient()).build(LCVendorAdapterInvoker.class);
+	 //   checkForLCUpdatesService.lcVendorAdapter(new LCVendorAdapterInput());

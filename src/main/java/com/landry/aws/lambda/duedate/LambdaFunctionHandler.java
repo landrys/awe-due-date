@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.landry.aws.lambda.common.model.DueDateInput;
 import com.landry.aws.lambda.common.model.DueDateOutput;
+import com.landry.aws.lambda.common.util.LambdaFunctions;
 
 public class LambdaFunctionHandler implements RequestHandler<DueDateInput, DueDateOutput> {
 
@@ -11,6 +12,7 @@ public class LambdaFunctionHandler implements RequestHandler<DueDateInput, DueDa
     @Override
     public DueDateOutput handleRequest(DueDateInput input, Context lambdaContext) {
 
+        lambdaContext.getLogger().log("Function: " + LambdaFunctions.DUE_DATE);
 		if ( input != null && input.getPing() != null && containerId!=null )
 			return null;
 

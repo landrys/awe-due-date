@@ -4,14 +4,13 @@ import java.util.Iterator;
 
 import org.joda.time.DateTime;
 
+import com.landry.aws.lambda.businessday.BusinessDayService;
 import com.landry.aws.lambda.common.util.MyDateUtil;
 import com.landry.aws.lambda.duedate.model.VendorShipTimeDataBean;
 import com.landry.aws.lambda.duedate.model.VendorShipTimeDataBeans;
 
 public class DueDateCalculator
 {
-	private static final BusinessDayHelper helper = BusinessDayHelper.instance();
-
 	VendorShipTimeDataBeans vendorShipTimeDataBeans;
 	private DateTime arrivalDate;
 	private DateTime startDate;
@@ -25,21 +24,6 @@ public class DueDateCalculator
 		calculateArrivalDate();
 		return arrivalDate;
 	}
-
-	/*
-	private void calculateArrivalDate()
-	{
-		// TODO: Put in more here. For now just lets tr to get this to work
-		final DateBusinessDaysOut service = LambdaInvokerFactory.builder()
-				.lambdaClient(AWSLambdaClientBuilder.defaultClient()).build(DateBusinessDaysOut.class);
-		BusinessDayInput input = new BusinessDayInput();
-		input.setBusinessDays(3);
-		input.setDate("04-17-2017");
-		BusinessDayOutput out = service.dateBusinessDaysOut(input);
-		arrivalDate = MyDateUtil.toDateTime(out.getDate(), "MM-dd-yyyy");
-	
-	}
-	*/
 
 	private void findVendorShipTime() throws Exception
 	{
@@ -66,26 +50,26 @@ public class DueDateCalculator
 			// will take care of moving it to a business day.
 			startDate = getStartDateForRegularOrder();
 
-		arrivalDate = helper.moveForward(vendorShipTime.getShippingDays(), startDate);
+		arrivalDate = BusinessDayService.moveForward(vendorShipTime.getBusinessDays(), startDate);
+
 
 		if (!store.equalsIgnoreCase("Natick") && !vendorShipTime.isDropShipToStore())
-			arrivalDate = helper.moveForward(1, arrivalDate);
+			arrivalDate = BusinessDayService.moveForward(1, arrivalDate);
 
 		if (vendorShipTime.isBike())
-			arrivalDate = helper.moveForward(1, arrivalDate);
+			arrivalDate = BusinessDayService.moveForward(1, arrivalDate);
 	}
 
 	private DateTime getStartDateForWeeklyOrder()
 	{
 		WeeklyOrderStartDateCalculator wosdc = new WeeklyOrderStartDateCalculator.Builder()
 				.vendorShipTime(vendorShipTime).startDate(DateTime.now()).build();
-		//WeeklyOrderStartDateCalculator wosdc = appContext.getBean(WeeklyOrderStartDateCalculator.class, vendorShipTime, null);
 		return wosdc.getStartDate();
 	}
 
 	private DateTime getStartDateForRegularOrder()
 	{
-		return helper.moveForward(vendorShipTime.getBusinessDays(),
+		return BusinessDayService.moveForward(vendorShipTime.getBusinessDays(),
 				MyDateUtil.addDayToNowIfPastCutOffTime(vendorShipTime.getCutOffTime()));
 	}
 
@@ -156,3 +140,17 @@ public class DueDateCalculator
 			}
 		}
 */
+	/*
+	{
+		// TODO: Put in more here. For now just lets tr to get this to work
+		final DateBusinessDaysOut service = LambdaInvokerFactory.builder()
+				.lambdaClient(AWSLambdaClientBuilder.defaultClient()).build(DateBusinessDaysOut.class);
+		BusinessDayInput input = new BusinessDayInput();
+		input.setBusinessDays(3);
+		input.setDate("04-17-2017");
+		BusinessDayOutput out = service.dateBusinessDaysOut(input);
+		arrivalDate = MyDateUtil.toDateTime(out.getDate(), "MM-dd-yyyy");
+	
+	}
+	*/
+

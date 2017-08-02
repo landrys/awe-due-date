@@ -22,7 +22,7 @@ public class LambdaFunctionHandler implements RequestHandler<DueDateInput, DueDa
 		lambdaContext.getLogger().log("ContainerId: " + containerId);
 		lambdaContext.getLogger().log("Input: " + input.toString());
 
-	    DueDateService dds =  DueDateService.instance();
+	    DueDateServiceNoCache dds =  DueDateServiceNoCache.instance();
 	    DueDateOutput ddo;
 		try
 		{
@@ -44,68 +44,7 @@ public class LambdaFunctionHandler implements RequestHandler<DueDateInput, DueDa
 					.info(e.getMessage() + "ERROR: If not enough info please see logs amazon.")
 					.build();
 		}
-		/*
-	    DueDateCalculator ddc = context.getBean(DueDateCalculator.class, input.getVendorShipTimeIds().get(0), input.getStore() );
-		DueDateOutput ddo = null;
-
-        try
-		{
-			DateTime arrivalDate =  ddc.getArrivalDate2();
-			ddo = new DueDateOutput.Builder()
-					.arrivalDate(arrivalDate.toString())
-					//.vendorShipTimeId(ddc.todo)
-					.info("Success")
-					.build();
-		}
-		catch (Exception e)
-		{
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			ddo = new DueDateOutput.Builder()
-					.info(e.getMessage() + "If not enough info please see logs amazon.")
-					.build();
-		}
-		*/
 
 		return  ddo;
     }
 }
-/* 
- *     private static String getStringFromInputStream(InputStream is) {
-
-		BufferedReader br = null;
-		StringBuilder sb = new StringBuilder();
-
-		String line;
-		try {
-
-			br = new BufferedReader(new InputStreamReader(is));
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		return sb.toString();
-
-	}
-
-
-		AmazonS3 client = AmazonS3ClientBuilder.defaultClient();
-    	S3Object xFile = client.getObject("lambda-function-bucket-us-east-1-1493065008443", ".credentials/landryeleven/StoredCredential");
-    	InputStream contents = xFile.getObjectContent();
-
-    	context.getLogger().log(getStringFromInputStream(contents));
-    	context.getLogger().log("The user.home property:" + System.getProperty("user.home"));
- 
-*/

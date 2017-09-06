@@ -2,6 +2,7 @@ package com.landry.aws.lambda.duedate;
 
 import org.joda.time.DateTime;
 
+import com.landry.aws.lambda.businessday.BusinessDayService;
 import com.landry.aws.lambda.common.util.MyDateUtil;
 import com.landry.aws.lambda.duedate.model.VendorShipTimeDataBean;
 
@@ -14,8 +15,7 @@ public class WeeklyOrderStartDateCalculator
 	public DateTime getStartDate()
 	{
 		/*
-		 * TODO: Need to check if the orderDate you find falls on a holiday. If
-		 * so need to get the next order date that does not fall on a holiday
+		 * TODO:  TEST the holiday shit I added.
 		 * 
 		 */
 
@@ -26,20 +26,33 @@ public class WeeklyOrderStartDateCalculator
 
 		for (Integer orderDay : vendorShipTime.getOrderDays())
 			if (startDate.getDayOfWeek() == orderDay)
-				if (!MyDateUtil.isPastCutOffTime(vendorShipTime.getCutOffTime()))
+				if (!MyDateUtil.isPastCutOffTime(vendorShipTime.getCutOffTime()) && !isHoliday())
 					return startDate;
 		/*
-		 * If made it here startDate is NOT on an order day OR we are past the cutOff
-		 * time on an order day.
+		 * If made it here startDate is NOT on an order day OR we are past the
+		 * cutOff time on an order day or the order day found is a holiday.
 		 */
 		return findNextOrderDay();
+	}
+
+	private boolean isHoliday()
+	{
+		DateTime calcDate = BusinessDayService.moveForward(0, startDate);
+		// Check if the same as startDate if so return it if not need to
+		// find the next order date.
+		if (calcDate.dayOfMonth().get() == startDate.dayOfMonth().get()) {
+		    startDate = new DateTime(calcDate);
+			return false;
+		}
+
+		return true;
 	}
 
 	private DateTime findNextOrderDay()
 	{
 		/*
 		 * Starting with startDate, which is today, get the next order day
-		 * not including today as we are passed the cutOff time.
+		 * not including today as we are passed the cutOff  or it is a holiday time.
 		 * 
 		 * 	1. First get dayOfWeek from startDate
 		 * 	2. Check if there is an order day greater than that and use the first one you find.
@@ -48,7 +61,10 @@ public class WeeklyOrderStartDateCalculator
 		 *   
 		 */
 		if (setForOrderDayGreaterThanDayOfWeek())
-			return startDate;
+			if ( !isHoliday() )
+			    return startDate;
+			else 
+				return findNextOrderDay();
 		else
 			return setForOrderDayLessThanDayOfWeek();
 
@@ -58,8 +74,10 @@ public class WeeklyOrderStartDateCalculator
 	{
 		int dayOfWeek = startDate.getDayOfWeek();
 		startDate = startDate.plusDays(7 - (dayOfWeek - vendorShipTime.getOrderDays()[0]));
-		return startDate;
-
+		if (!isHoliday() )
+			return startDate;
+		else
+			return findNextOrderDay();
 	}
 
 	private boolean setForOrderDayGreaterThanDayOfWeek()

@@ -50,12 +50,17 @@ public class LambdaFunctionHandlerTest {
     
     @Test
     public void testWeeklyOrderStartDate() {
-    	Integer[] orderDays = {1,5};
-    	LocalTime cutOffTime = new LocalTime(11,0);
+    	Integer[] orderDays = {2,4};
+    	LocalTime cutOffTime = new LocalTime(23,0);
 		VendorShipTimeDataBean vendorShipTime = new VendorShipTimeDataBean.Builder().
     			orderDays(orderDays).cutOffTime(cutOffTime).build();
 		WeeklyOrderStartDateCalculator wosdc = new WeeklyOrderStartDateCalculator.Builder()
-				.vendorShipTime(vendorShipTime).startDate(DateTime.parse("2017-09-01")).build();
+				.vendorShipTime(vendorShipTime).startDate(DateTime.parse("2017-11-22")).build();
+		
+		
+		WeeklyOrderStartDateCalculator wosdc1 = new WeeklyOrderStartDateCalculator.Builder()
+				.vendorShipTime(vendorShipTime).startDate(DateTime.now()).build();
 		System.out.println(wosdc.getStartDate());
+		System.out.println(wosdc1.getStartDate());
     }
 }

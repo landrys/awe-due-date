@@ -32,12 +32,13 @@ public class DueDateCalculatorNoCache
 
 	private void calculateArrivalDate()
 	{
-		if (vendorShipTime.isWeeklyOrder())
+		if (vendorShipTime.isWeeklyOrder()) {
 			startDate = getStartDateForWeeklyOrder();
-		else
+		} else {
 			// This can be a weekend day or holiday. The ArrivalDate stuff
 			// will take care of moving it to a business day.
 			startDate = getStartDateForRegularOrder();
+		}
 
 		arrivalDate = BusinessDayService.moveForward(vendorShipTime.getShippingDays(), startDate);
 

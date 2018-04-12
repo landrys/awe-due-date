@@ -37,7 +37,7 @@ public class WeeklyOrderStartDateCalculator
 
 	private boolean isHoliday()
 	{
-		DateTime calcDate = BusinessDayService.moveForward(0, startDate);
+		DateTime calcDate = BusinessDayService.moveForward(0, startDate.withTime(0,0,0,0));
 		// Check if the same as startDate if so return it if not need to
 		// find the next order date.
 		if (calcDate.dayOfMonth().get() == startDate.dayOfMonth().get()) {

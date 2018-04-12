@@ -1,1 +1,1 @@
-## Due Date Lambda Function that uses Dynamo as back end
+## Due Date Lambda Function with Dynamo as back end

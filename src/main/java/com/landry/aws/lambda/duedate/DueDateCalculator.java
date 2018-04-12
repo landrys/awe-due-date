@@ -56,8 +56,11 @@ public class DueDateCalculator
 		if (!store.equalsIgnoreCase("Natick") && !vendorShipTime.isDropShipToStore())
 			arrivalDate = BusinessDayService.moveForward(1, arrivalDate);
 
-		if (vendorShipTime.isBike())
-			arrivalDate = BusinessDayService.moveForward(1, arrivalDate);
+                if (vendorShipTime.isBike()) {
+                    arrivalDate = BusinessDayService.moveForward(1, arrivalDate);
+                    if (store.equalsIgnoreCase("Natick"))
+                        arrivalDate = BusinessDayService.moveForward(1, arrivalDate);
+                }
 	}
 
 	private DateTime getStartDateForWeeklyOrder()
